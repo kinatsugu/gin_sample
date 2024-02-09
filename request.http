@@ -1,0 +1,30 @@
+// get all todos
+GET http://localhost/api/v1/todos
+
+###
+// get a single todo
+GET http://localhost/api/v1/todos/3
+
+###
+// create a todo
+POST http://localhost/api/v1/todos
+Content-Type: application/json
+
+{
+  "title": "Todo 1",
+  "status": true
+}
+
+###
+// update a todo
+PUT http://localhost/api/v1/todos/4
+Content-Type: application/json
+
+{
+  "title": "Todo 1",
+  "status": false
+}
+
+###
+// delete a todo
+DELETE http://localhost/api/v1/todos/2
