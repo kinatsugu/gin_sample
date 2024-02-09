@@ -24,7 +24,12 @@ func main() {
 	if err != nil {
 		panic("failed to connect to database")
 	}
-	defer DB.Close()
+	defer func(DB *gorm.DB) {
+		err := DB.Close()
+		if err != nil {
+			panic("failed to close database")
+		}
+	}(DB)
 
 	// Create the todo table if it does not exist
 	DB.AutoMigrate(&Todo{})
@@ -40,7 +45,10 @@ func main() {
 	r.DELETE("/todos/:id", DeleteTodo) // Delete a todo by id
 
 	// Start the server
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		return
+	}
 }
 
 // GetTodos is a handler function that returns all todos in JSON format
