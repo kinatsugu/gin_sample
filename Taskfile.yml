@@ -1,0 +1,19 @@
+version: 3
+
+tasks:
+  up:
+    cmd: docker-compose up -d
+    desc: コンテナを起動します
+
+  stop:
+    cmd: docker-compose stop
+    desc: コンテナを停止します
+
+  down:
+    cmd: docker-compose down
+    desc: コンテナを停止します
+
+  logs:
+    cmd: docker-compose logs -f
+    desc: コンテナのログを表示します
+

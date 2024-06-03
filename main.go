@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"io/ioutil"
+	"os"
 )
 
 // Todo is a struct that represents a todo item
@@ -18,6 +21,17 @@ type Todo struct {
 var DB *gorm.DB
 
 func main() {
+	// アクセスログファイルを開く
+	f1, _ := os.OpenFile("access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	// エラーログファイルを開く
+	f2, _ := os.OpenFile("error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	// GinのデフォルトのWriterをアクセスログファイルに設定
+	gin.DefaultWriter = f1
+
+	// Ginのデフォルトのエラーロガーをエラーログファイルに設定
+	gin.DefaultErrorWriter = f2
 	// Connect to the database
 	var err error
 	DB, err = gorm.Open("sqlite3", "todo.db")
@@ -37,12 +51,20 @@ func main() {
 	// Create a gin router with default middleware
 	r := gin.Default()
 
+	r.Use(func(c *gin.Context) {
+		buf, _ := ioutil.ReadAll(c.Request.Body)
+		r := bytes.NewReader(buf)
+		c.Request.Body = ioutil.NopCloser(r)
+		f1.WriteString(string(buf))
+	})
+
 	// Define the API endpoints
 	r.GET("/todos", GetTodos)          // Get all todos
 	r.POST("/todos", CreateTodo)       // Create a new todo
 	r.GET("/todos/:id", GetTodo)       // Get a single todo by id
 	r.PUT("/todos/:id", UpdateTodo)    // Update a todo by id
 	r.DELETE("/todos/:id", DeleteTodo) // Delete a todo by id
+	r.GET("/todos/error", ErrorPage)   // Errorが絶対に起こるURL
 
 	// Start the server
 	err = r.Run()
@@ -150,4 +172,9 @@ func DeleteTodo(c *gin.Context) {
 
 	// Return a no content status
 	c.Status(204)
+}
+
+// Errorが絶対に起こるURL
+func ErrorPage(c *gin.Context) {
+	panic("Errorが絶対に起こるURL")
 }
