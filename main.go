@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"io/ioutil"
 	"os"
 )
 
@@ -52,10 +50,11 @@ func main() {
 	r := gin.Default()
 
 	r.Use(func(c *gin.Context) {
-		buf, _ := ioutil.ReadAll(c.Request.Body)
-		r := bytes.NewReader(buf)
-		c.Request.Body = ioutil.NopCloser(r)
-		f1.WriteString(string(buf))
+		//buf, _ := ioutil.ReadAll(c.Request.Body)
+		//r := bytes.NewReader(buf)
+		//c.Request.Body = ioutil.NopCloser(r)
+		//f1.WriteString(string(buf))
+		c.Next()
 	})
 
 	// Define the API endpoints
